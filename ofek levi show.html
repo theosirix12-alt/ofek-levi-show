@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM ALERT - DO NOT CLOSE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'MS Sans Serif', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .popup {
+            background: linear-gradient(180deg, #0099cc 0%, #0077aa 100%);
+            border: 3px solid #003366;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+            width: 100%;
+            max-width: 520px;
+            overflow: hidden;
+            animation: shake 0.6s ease-in-out;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        .popup-header {
+            background: linear-gradient(90deg, #003366 0%, #0066cc 100%);
+            color: #ffff00;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #003366;
+            position: sticky;
+            top: 0;
+        }
+        
+        .warning-icon {
+            font-size: 20px;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .close-btn {
+            background: #c0c0c0;
+            border: 2px outset #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            width: 24px;
+            height: 22px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+        }
+        
+        .close-btn:active {
+            border-style: inset;
+            border-right-color: #dfdfdf;
+            border-bottom-color: #dfdfdf;
+            border-left-color: #808080;
+            border-top-color: #808080;
+        }
+        
+        .popup-content {
+            background: #c0c0c0;
+            padding: 16px;
+            color: #000;
+        }
+        
+        .alert-box {
+            background: #ffffcc;
+            border: 2px solid #ffaa00;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .alert-title {
+            font-weight: bold;
+            color: #cc0000;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        .photo-preview {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border: 2px inset #dfdfdf;
+            margin-bottom: 12px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            display: block;
+        }
+        
+        .info-box {
+            background: #e8f4f8;
+            border: 1px solid #0099cc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            color: #003366;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .sys-button {
+            background: #c0c0c0;
+            border: 2px outset #dfdfdf;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            min-width: 75px;
+            transition: all 0.1s;
+        }
+        
+        .sys-button:hover {
+            background: #dfdfdf;
+        }
+        
+        .sys-button:active {
+            border-style: inset;
+            border-right-color: #dfdfdf;
+            border-bottom-color: #dfdfdf;
+            border-left-color: #808080;
+            border-top-color: #808080;
+        }
+        
+        .sys-button.danger {
+            color: #cc0000;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        .exit-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ff0000;
+            color: #ffff00;
+            padding: 40px;
+            border: 5px solid #ffff00;
+            border-radius: 10px;
+            z-index: 2000;
+            text-align: center;
+            animation: warningFlash 0.3s;
+            max-width: 90%;
+        }
+
+        @keyframes warningFlash {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .exit-warning h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .exit-warning p {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+
+        .siren {
+            font-size: 48px;
+            margin: 20px 0;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ok-btn {
+            background: #ffff00;
+            color: #ff0000;
+            border: 3px solid #ff0000;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .ok-btn:hover {
+            background: #ffcc00;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- FIRST POPUP: EP ANNOUNCEMENT -->
+    <div id="popup1" class="popup-container">
+        <div class="popup">
+            <div class="popup-header">
+                <span><span class="warning-icon">⚠️</span>SYSTEM ALERT - PIIN'JN'O VIRUS DETECTED</span>
+                <button class="close-btn" onclick="triggerExitWarning()">×</button>
+            </div>
+            
+            <div class="popup-content">
+                <div class="alert-box">
+                    <div class="alert-title">🚨 CRITICAL FILE DETECTED 🚨</div>
+                    <p style="margin: 0;">Your system has been infected with <strong>PIIN'JN'O.VIRUS</strong> - A new musical outbreak by Ofek Levi. Quarantine is NOT recommended.</p>
+                </div>
+                
+                <img id="epImage" src="https://raw.githubusercontent.com/theosirix12-alt/ofek-levi-show/main/image.png" alt="PIIN'JN'O EP" class="photo-preview" onerror="this.style.display='none';">
+                
+                <div class="info-box">
+                    <strong>🎵 Infected File:</strong> PIIN'JN'O_EP.VIRUS<br>
+                    <strong>📅 Infection Date:</strong> 24.6.2026<br>
+                    <strong>⚠️ Threat Level:</strong> MAXIMUM 🔥<br>
+                    <strong>💿 Artist:</strong> Ofek Levi<br>
+                    <strong>Recommendation:</strong> DO NOT DELETE
+                </div>
+                
+                <div class="button-group">
+                    <button class="sys-button" onclick="triggerExitWarning()">Quarantine</button>
+                    <button class="sys-button danger" onclick="showPopup2()">Yes, Infect Me!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SECOND POPUP: SHOW INVITATION -->
+    <div id="popup2" class="popup-container hidden">
+        <div class="popup">
+            <div class="popup-header">
+                <span><span class="warning-icon">🎉</span>SHOW ALERT - OUTBREAK SPREADING</span>
+                <button class="close-btn" onclick="triggerExitWarning()">×</button>
+            </div>
+            
+            <div class="popup-content">
+                <div class="alert-box" style="background: #ffeeee; border-color: #ff6666;">
+                    <div class="alert-title">🎤 INFECTION IS SPREADING IN REAL TIME 🎤</div>
+                    <p style="margin: 0;">The virus is now live. Join the outbreak at a massive live event. This is NOT a drill.</p>
+                </div>
+                
+                <img id="showImage" src="https://raw.githubusercontent.com/theosirix12-alt/ofek-levi-show/main/%25FEED6D1C7A991EBD954B25DE770991706A2B1061.jpeg" alt="Ofek Levi Live" class="photo-preview" onerror="this.style.display='none';">
+                
+                <div class="info-box">
+                    <strong>📍 Location:</strong> נמל ת"א - בית היוצר<br>
+                    <strong>📅 Date:</strong> 06.07.2026<br>
+                    <strong>🎸 Artist:</strong> Ofek Levi<br>
+                    <strong>⚡ Event Type:</strong> LIVE PERFORMANCE<br>
+                    <strong>STATUS:</strong> QUARANTINE LIFTED
+                </div>
+                
+                <div class="alert-box" style="background: #e8ffe8; border-color: #66ff66; color: #003300;">
+                    <div style="font-weight: bold; color: #003300; margin-bottom: 6px;">✓ CURE AVAILABLE</div>
+                    <p style="margin: 0; color: #003300;">Get your tickets NOW before this infection spreads everywhere! Limited capacity outbreak zone.</p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="sys-button" onclick="triggerExitWarning()">Close</button>
+                    <button class="sys-button danger" onclick="showTicketsMessage()">Get Tickets</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXIT WARNING OVERLAY -->
+    <div id="exitWarning" class="exit-warning hidden">
+        <div class="siren">🚨</div>
+        <h1>WOOOOH WOOOOH!</h1>
+        <p>ARE YOU SURE??</p>
+        <p>POLICE ARE ON THEIR WAY!!!</p>
+        <div class="siren">🚔 🚨 🚔</div>
+        <button class="ok-btn" onclick="dismissWarning()">OK, I STAY!</button>
+    </div>
+    
+    <script>
+        function showPopup2() {
+            document.getElementById('popup1').classList.add('hidden');
+            document.getElementById('popup2').classList.remove('hidden');
+        }
+        
+        function triggerExitWarning() {
+            document.getElementById('exitWarning').classList.remove('hidden');
+            playSiren();
+        }
+
+        function dismissWarning() {
+            document.getElementById('exitWarning').classList.add('hidden');
+        }
+
+        function showTicketsMessage() {
+            alert('אני נראה לכם אחד שיש לו כרטיסים? תלחצו על הקישור');
+            window.open('https://www.instagram.com/ofekle9', '_blank');
+        }
+
+        function playSiren() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.2);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.4);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.4);
+        }
+
+        // Prevent page exit attempts (works on desktop)
+        window.addEventListener('beforeunload', function(e) {
+            triggerExitWarning();
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+
+        // Detect back button and mobile navigation
+        history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function() {
+            triggerExitWarning();
+            history.pushState(null, null, window.location.href);
+        });
+
+        // Prevent Alt+F4 and other keyboard shortcuts on desktop
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F4' || (e.altKey && e.key === 'F4')) {
+                e.preventDefault();
+                triggerExitWarning();
+            }
+        });
+    </script>
+</body>
+</html>
